@@ -119,22 +119,31 @@ if generate_button:
                     num=num_questions
                 )
 
-                if pdf_questions and pdf_questions.questions:
-                    st.success(f"Successfully generated {len(pdf_questions.questions)} MCQs!")
-                    for q_data in pdf_questions.questions:
-                        st.markdown("---")
-                        st.subheader(f"Question: {q_data.question}")
+                # Debugging: Inspect the response
+                st.write("Debug - PDF Questions Response:", pdf_questions)
 
-                        options_display = ""
-                        for idx, option in enumerate(q_data.options, start=1):
-                            options_display += f"{chr(64+idx)}. {option}  \n"
-                        st.markdown(f"**Options:**  \n{options_display}")
-                        st.markdown(f"**Correct Answer:** {q_data.answer}")
-                        if q_data.explanation:
-                            st.markdown(f"**Explanation:** {q_data.explanation}")
+                # Handle empty or invalid responses
+                if not pdf_questions or not hasattr(pdf_questions, "questions"):
+                    st.error("No questions were generated. Please check the input PDF and try again.")
+                    st.stop()
 
-                else:
-                    st.error("Failed to generate MCQs. Please check settings and try again.")
+                questions = pdf_questions.questions
+                if not questions:
+                    st.error("No questions were generated. Please check the input PDF and try again.")
+                    st.stop()
+
+                st.success(f"Successfully generated {len(questions)} MCQs!")
+                for q_data in questions:
+                    st.markdown("---")
+                    st.subheader(f"Question: {q_data.question}")
+
+                    options_display = ""
+                    for idx, option in enumerate(q_data.options, start=1):
+                        options_display += f"{chr(64+idx)}. {option}  \n"
+                    st.markdown(f"**Options:**  \n{options_display}")
+                    st.markdown(f"**Correct Answer:** {q_data.answer}")
+                    if q_data.explanation:
+                        st.markdown(f"**Explanation:** {q_data.explanation}")
 
         except Exception as e:
             st.error(f"An error occurred during question generation: {e}")
